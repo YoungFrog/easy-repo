@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="js/gitlab/commits.js"></script>
+    <script src="js/gitlab/user.js"></script>
+    <script src="js/gitlab/group.js"></script>
+    <script src="js/gitlab/project.js"></script>
+    <script src="js/style.js"></script>
+    <script src="js/token-input.js"></script>
+    <script src="js/init.js"></script>
+    <script src="js/index.js"></script>
+    <script src="js/group-input.js"></script>
+    <script src="js/access-lvl-input.js"></script>
+    <script src="js/projects-builder.js"></script>
+    <script src="js/data/groups.js"></script>
+    <link rel="stylesheet" href="style/index.css">
+    <title>Scripts - Esi-gitlab-script</title>
+</head>
+<body>
+    <div class="w-full">
+        <h1 class="text-3xl bg-green-200 mb-10 py-5">Esi-gitlab-script <span id="network-message" class="info text-red-500 hidden">Non connecté !!!</span></h1>
+
+        <form class="max-w-md mx-auto">
+            <fieldset class="px-2 shadow-md rounded my-5">
+                <legend class="text-xl text-gray-500 mb-2">Projects configuration</legend>
+                <label for="token-input">Token : </label>
+                <div id="token-block">
+                    <input 
+                        class="mt-1 block w-full rounded-md border-gray-100 shadow-sm focus:border-emerald-100 focus:ring focus:ring-emerald-200 ring-opacity-50"
+                        type="text" id="token-input" name="token" placeholder="FcZjsv_VBWhx8NdYywr2" required>
+                    <p id="token-error" class="info text-red-500 text-xs italic hidden">Token absent ou non valide.</p>
+                </div>
+                <div>
+                    <div id="group-block">
+                        <label for="group-input">Groupe : <span class="info text-green-700 text-xs italic hidden" id="group-id"></span></label>
+                        <input 
+                            class="mt-1 block w-full rounded-md border-gray-100 shadow-sm focus:border-emerald-100 focus:ring focus:ring-emerald-200 focus:ring-opacity-50"
+                            id="group-input" 
+                            name="group" 
+                            placeholder="2022-2023/dev1/interro" 
+                            type="text">
+                        <p id="group-error" class="info text-red-500 text-xs italic hidden">Le group n'existe pas.</p>
+                    </div>
+                </div>
+                <div class="flex justify-between space-x-2">
+                    <div>
+                        <label for="prefix">Prefix :</label>
+                        <input 
+                            class="mt-1 block w-full rounded-md border-gray-100 shadow-sm focus:border-emerald-100 focus:ring focus:ring-emerald-200 focus:ring-opacity-50"
+                            id="prefix" name="prefix" type="text" placeholder="g">
+                    </div>
+                    <div>
+                        <label for="postfix">Postfix :</label>
+                        <input 
+                            class="mt-1 block w-full rounded-md border-gray-100 shadow-sm focus:border-emerald-100 focus:ring focus:ring-emerald-200 focus:ring-opacity-50"
+                            id="postfix" name="postfix" type="text" placeholder="-i1">
+                    </div>
+                </div>
+                <div id="matricule-line">
+                    <label for="matricules">Matricules :</label>
+                    <div id="data-loader">
+                        <select
+                            class="mt-1 block w-full rounded-md border-gray-100 shadow-sm focus:border-emerald-100 focus:ring focus:ring-emerald-200 focus:ring-opacity-50"
+                            id="ue-select" name="ue-select">
+                        </select>
+                        <div>
+                            <label for="checkbox-group" class="text-green-600">Choisir un groupe</label>
+                            <input id="checkbox-group" class="mx-1" type="checkbox">
+                        </div>
+                        <select
+                            class="hidden mt-1 block w-full rounded-md border-gray-100 shadow-sm focus:border-emerald-100 focus:ring focus:ring-emerald-200 focus:ring-opacity-50"
+                            id="group-select" name="group-select">
+                        </select>
+                        <button 
+                            class="bg-green-200 hover:bg-green-100 text-green-600 font-bold py-2 my-2 px-4 rounded focus:outline-none focus:shadow-outline"
+                            id="loader-button" type="button">Charger les matricules</button>
+                    </div>
+                    <textarea 
+                        class="resize-none h-60 mt-1 block w-full rounded-md border-gray-100 shadow-sm focus:border-emerald-100 focus:ring focus:ring-emerald-200 focus:ring-opacity-50"
+                        type="text" id="matricules" name="matricules"
+                        placeholder="12345"></textarea>
+                </div>
+                <div>
+                    <label for="lvl-select">Access level :</label>
+                    <select 
+                        class="mt-1 block w-full rounded-md border-gray-100 shadow-sm focus:border-emerald-100 focus:ring focus:ring-emerald-200 focus:ring-opacity-50"
+                        id="lvl-select" name="lvl-select"></select>
+                </div>
+                <div class="grid">
+                    <button 
+                        class="bg-green-400 hover:bg-green-500 text-white font-bold py-2 my-2 px-4 rounded focus:outline-none focus:shadow-outline"
+                        type="button" id="project-builder-button">Créer projets</button>
+                </div>
+            </fieldset>
+        </form>
+        <div id="log-box" class="max-w-md mx-auto bg-green-100 shadow-md grid">
+            <button 
+                class="m-2 justify-self-end border border-green-200 bg-white hover:bg-green-200 text-sm font-medium text-white py-1 px-1 rounded-full focus:outline-none focus:shadow-outline"
+                id="clipboard-button" type="button">
+                <svg class="fill-green-500" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16"><path  d="M4.00029246,4.08524952 L4,10.5 C4,11.8254834 5.03153594,12.9100387 6.33562431,12.9946823 L6.5,13 L10.9143985,13.000703 C10.7082819,13.5829319 10.1528467,14 9.5,14 L6,14 C4.34314575,14 3,12.6568542 3,11 L3,5.5 C3,4.84678131 3.41754351,4.29108512 4.00029246,4.08524952 Z M11.5,2 C12.3284271,2 13,2.67157288 13,3.5 L13,10.5 C13,11.3284271 12.3284271,12 11.5,12 L6.5,12 C5.67157288,12 5,11.3284271 5,10.5 L5,3.5 C5,2.67157288 5.67157288,2 6.5,2 L11.5,2 Z M11.5,3 L6.5,3 C6.22385763,3 6,3.22385763 6,3.5 L6,10.5 C6,10.7761424 6.22385763,11 6.5,11 L11.5,11 C11.7761424,11 12,10.7761424 12,10.5 L12,3.5 C12,3.22385763 11.7761424,3 11.5,3 Z"/></svg>
+                <!-- icon by Microsoft -> https://iconscout.com/icon/copy-2652889 -->
+            </button>
+        </div>
+    </div>
+    <div id="test-div"></div>
+    <script>
+        initGroupnameInput();
+        initAccessLevelInput();
+        const track = new Map();
+
+        initProjectSBuilderButton(
+            () => document.getElementById("prefix"),
+            () => document.getElementById("postfix"),
+            () => document.getElementById("matricules"),
+            getAccessLvl,
+            tracker(track),
+            projectCreatedLogFunction(track));
+        
+        const clipboardButton = document.getElementById("clipboard-button");
+        const theTextArea = document.getElementById("matricules");
+        clipboardButton.addEventListener("click", () => {
+            const lines = [];
+            track.forEach((v, k) => lines.push(`${k},${v.join(",")},`))
+            navigator.clipboard.writeText(lines.join("\n"));
+        });
+
+        // loader draft
+        const ueSelectElement = document.getElementById("ue-select");
+        ues().forEach(ue => {
+            const optionElement = document.createElement("option");
+            optionElement.setAttribute("value", ue);
+            optionElement.innerText = ue;
+            ueSelectElement.append(optionElement);
+        })
+        
+        const groupSelectElement = document.getElementById("group-select");
+        function fillGroupOptions(ue) {
+            groupSelectElement.innerHTML = "";
+
+            ueGroups(ue).forEach(group => {
+                const optionElement = document.createElement("option");
+                optionElement.setAttribute("value", group);
+                optionElement.innerText = group;
+                groupSelectElement.append(optionElement);
+            });
+        }
+        const checkboxGroup = document.getElementById("checkbox-group");
+        checkboxGroup.addEventListener("change", () => {
+            if (checkboxGroup.checked) {
+                groupSelectElement.classList.remove("hidden");
+                fillGroupOptions(ueSelectElement.value);
+            } else {
+                groupSelectElement.classList.add("hidden");
+            }
+        })
+
+        ueSelectElement.addEventListener("change", () => {
+            if (checkboxGroup.checked) {
+                fillGroupOptions(ueSelectElement.value);
+            }
+        });
+
+        
+        document.getElementById("loader-button").addEventListener("click", () => {
+            const matriculesInput = document.getElementById("matricules");
+
+            let matricules;
+            if (checkboxGroup.checked) {
+                matricules = getMatricules(ueSelectElement.value, groupSelectElement.value);
+                console.log(ueSelectElement.value);
+                console.log(groupSelectElement.value);
+                console.log(matricules);
+            } else {
+                matricules = getMatricules(ueSelectElement.value);
+            }
+
+            matriculesInput.value = matricules.join("\n");
+        });
+    </script>
+</body>
+</html>

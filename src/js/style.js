@@ -1,0 +1,1 @@
+const errorClasses = ["ring", "ring-red-400"];
