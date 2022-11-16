@@ -19,3 +19,13 @@ function isFilledToken() {
 
     return true;
 }
+
+function initTokenInput() {
+    const storedToken = localStorage.getItem("token");
+    if (storedToken) {
+        tokenElement().value = storedToken;
+    }
+    tokenElement().addEventListener("focusout", () => {
+        localStorage.setItem("token", tokenElement().value);
+    });
+}
