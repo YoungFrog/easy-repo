@@ -24,8 +24,8 @@ function initTokenInput() {
     const storedToken = localStorage.getItem("token");
     if (storedToken) {
         tokenElement().value = storedToken;
+    } else {
+        document.getElementById("login-block").classList.remove("hidden")
     }
-    tokenElement().addEventListener("focusout", () => {
-        localStorage.setItem("token", tokenElement().value);
-    });
+
 }

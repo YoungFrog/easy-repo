@@ -10,7 +10,7 @@ function requestURL(requestPathname) {
 
 function getHeader() {
     return new Headers({
-        'PRIVATE-TOKEN': getToken(),
+        'Authorization': "Bearer " + getToken(),
         'Content-Type': 'application/json',
     });
 }

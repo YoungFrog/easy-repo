@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Setting token...</title>
+    <script src="js/auth_config.js"></script>
+</head>
+
+<body>
+    Fetching token...
+
+    If nothing happens, check console or <a href="index.html">retry</a>
+    <script>
+        checkStateAndRequestToken()
+
+        function checkStateAndRequestToken() {
+            let sp = (new URL(document.location)).searchParams;
+
+            if (!sp.has('code') || !sp.has('state')) {
+                throw new Error("Missing code or state.");
+            }
+
+            let code = sp.get('code')
+            let received_state = sp.get('state')
+            let stored_state = sessionStorage.getItem('state')
+
+            if (!stored_state || stored_state !== received_state) {
+                throw new Error("State is unexpected. Try again")
+            }
+
+            request_token(code).then(({ access_token }) => {
+                localStorage.setItem('token', access_token)
+                document.location = main_uri
+            }).catch(error => console.error(error))
+
+
+        }
+
+
+        function request_token(code) {
+            return fetch((url_for_token), {
+                method: 'POST',
+                headers: [['Content-Type', 'application/x-www-form-urlencoded']],
+                body: new URLSearchParams({
+                    client_id,
+                    code,
+                    grant_type: 'authorization_code',
+                    redirect_uri, // not actually used as a callback now, but must be the same as before
+                    code_verifier: localStorage.getItem('code_verifier')
+                }).toString()
+            }).then(ans => {
+                if (!ans.ok) throw new Error("An HTTP error occurred")
+                return ans.json()
+            })
+
+        }
+
+    </script>
+</body>
+
+</html>
